@@ -1,0 +1,7 @@
+Crossbar.io private key for node authentication - KEEP THIS SAFE!
+
+creator: pi@raspberrypi
+created-at: 2016-09-06T22:32:19.315Z
+machine-id: 18634e1404184594bc66ddacfba0bf43
+public-key-ed25519: f015a8acbd22469c962da6d46b64bf7d63f1ed7c68372cb066d3b0910878e931
+private-key-ed25519: 85f4892834dc327a964d7d592b03b0e45c5f6513f646c38035ccf7aeeeee93e7
