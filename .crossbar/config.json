@@ -48,6 +48,30 @@
                     }
                 }
             ]
+        },
+        {
+            "type": "container",
+            "options": {
+                "pythonpath": [
+                    ".."
+                ]
+            },
+            "components": [
+                {
+                    "type": "class",
+                    "classname": "hello.AppSession",
+                    "realm": "realm1",
+                    "transport": {
+                        "type": "websocket",
+                        "endpoint": {
+                            "type": "tcp",
+                            "host": "127.0.0.1",
+                            "port": 8000
+                        },
+                        "url": "ws://127.0.0.1:8000/ws"
+                    }
+                }
+            ]
         }
     ]
 }
