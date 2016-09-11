@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
    <body>
-      <a id="forward" href="#">Forward</a>
+      <button id="forward">Forward</button>
+      <button id="backward">Backward</button>
+      <button id="left">Left</button>
+      <button id="right">Right</button>
+      
       <h1>MR.Robot</h1>
       <script>AUTOBAHN_DEBUG = true;</script>
       <script src="http://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"></script>
@@ -33,30 +37,90 @@
 
             console.log("Connected");
             session = session;
-            var button = document.getElementById("forward");
-            if (button.addEventListener) {  // all browsers except IE before version 9
-                button.addEventListener ("mousedown", function () {
-                  session.call('com.interactive-object.forward').then(
-                  function (res) {
-                     console.log("forward() ");
-                  },
-                  function (err) {
-                     
-                  });
-                }, false);
-                button.addEventListener ("mouseup", function () {
-                  session.call('com.interactive-object.stop').then(
-                  function (res) {
-                     console.log("stop() ");
-                  },
-                  function (err) {
-                     
-                  }
-                  );
-                }, false);
-            }
+            var forwardBtn = document.getElementById("forward");
+            forwardBtn.addEventListener("mousedown", function () {
+               session.call('com.interactive-object.forwardon').then(
+               function (res) {
+                  console.log("forwardOn() ");
+               },
+               function (err) {
+                  
+               });
+             }, false);
+             forwardBtn.addEventListener ("mouseup", function () {
+               session.call('com.interactive-object.forwardoff').then(
+               function (res) {
+                  console.log("forwardOff() ");
+               },
+               function (err) {
+                  
+               }
+               );
+             }, false);
             
-           
+            var backwardBtn = document.getElementById("backward");
+            backwardBtn.addEventListener("mousedown", function () {
+               session.call('com.interactive-object.backwardon').then(
+               function (res) {
+                  console.log("backwardOn() ");
+               },
+               function (err) {
+                  
+               });
+             }, false);
+             backwardBtn.addEventListener ("mouseup", function () {
+               session.call('com.interactive-object.backwardoff').then(
+               function (res) {
+                  console.log("backwardOff() ");
+               },
+               function (err) {
+                  
+               }
+               );
+             }, false);
+             
+            var leftBtn = document.getElementById("left");
+            leftBtn.addEventListener("mousedown", function () {
+               session.call('com.interactive-object.lefton').then(
+               function (res) {
+                  console.log("leftOn() ");
+               },
+               function (err) {
+                  
+               });
+             }, false);
+             leftBtn.addEventListener("mouseup", function () {
+               session.call('com.interactive-object.leftoff').then(
+               function (res) {
+                  console.log("leftOff() ");
+               },
+               function (err) {
+                  
+               }
+               );
+             }, false);
+             
+            var rightBtn = document.getElementById("right");
+            rightBtn.addEventListener("mousedown", function () {
+               session.call('com.interactive-object.righton').then(
+               function (res) {
+                  console.log("rightOn() ");
+               },
+               function (err) {
+                  
+               });
+             }, false);
+             rightBtn.addEventListener("mouseup", function () {
+               session.call('com.interactive-object.rightoff').then(
+               function (res) {
+                  console.log("rightOff() ");
+               },
+               function (err) {
+                  
+               }
+               );
+             }, false);
+             
                
          };
 
