@@ -34,17 +34,49 @@ class AppSession(ApplicationSession):
 
         # REGISTER a procedure for remote calling
         #
-        def forward():
-            self.log.info("forward")
+        def forwardOn():
+            self.log.info("forwardOn")
             motors.motor1.setSpeed(SPEED_2V)
             motors.motor2.setSpeed(SPEED_2V)
             
-        def stop():
-            self.log.info("stop")
+        def forwardOff():
+            self.log.info("forwardOff")
+            motors.motor1.setSpeed(0)
+            motors.motor2.setSpeed(0)
+
+        # REGISTER a procedure for remote calling
+        #
+        def backwardOn():
+            self.log.info("backwardOn")
+            motors.motor1.setSpeed(-SPEED_2V)
+            motors.motor2.setSpeed(-SPEED_2V)
+            
+        def backwardOff():
+            self.log.info("backwardOff")
             motors.motor1.setSpeed(0)
             motors.motor2.setSpeed(0)
             
-        yield self.register(forward, 'com.interactive-object.forward')
-        yield self.register(stop, 'com.interactive-object.stop')
-        self.log.info("procedure forward() and stop() registered")
+        def leftOn():    
+            motors.motor2.setSpeed(SPEED_2V)
+            
+        def leftOff():
+            motors.motor2.setSpeed(0)
+
+        def rightOn():    
+            motors.motor1.setSpeed(SPEED_2V)
+            
+        def rightOff():
+            motors.motor1.setSpeed(0)
+            
+        yield self.register(forwardOn, 'com.interactive-object.forwardon')
+        yield self.register(forwardOff, 'com.interactive-object.forwardoff')
+        yield self.register(backwardOn, 'com.interactive-object.backwardon')
+        yield self.register(backwardOff, 'com.interactive-object.backwardoff')
+
+        yield self.register(leftOn, 'com.interactive-object.lefton')
+        yield self.register(leftOff, 'com.interactive-object.leftoff')
+        yield self.register(rightOn, 'com.interactive-object.righton')
+        yield self.register(rightOff, 'com.interactive-object.rightoff')
+        
+        self.log.info("procedure registered")
 
