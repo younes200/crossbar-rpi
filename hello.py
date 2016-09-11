@@ -15,6 +15,7 @@ from autobahn.twisted.util import sleep
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.wamp.exception import ApplicationError
 
+SPEED_2V = MAX_SPEED / 2
 
 class AppSession(ApplicationSession):
 
@@ -35,9 +36,13 @@ class AppSession(ApplicationSession):
         #
         def forward():
             self.log.info("forward")
+            motors.motor1.setSpeed(SPEED_2V)
+            motors.motor2.setSpeed(SPEED_2V)
             
         def stop():
             self.log.info("stop")
+            motors.motor1.setSpeed(0)
+            motors.motor2.setSpeed(0)
             
         yield self.register(forward, 'com.interactive-object.forward')
         yield self.register(stop, 'com.interactive-object.stop')
