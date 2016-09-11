@@ -27,35 +27,6 @@
          });
 
 
-         // timers
-         //
-         var session;
-
-
-
-        
-         function forwardDown(){
-             session.call('com.interactive-object.forward').then(
-                  function (res) {
-                     console.log("forward() ");
-                  },
-                  function (err) {
-                     
-                  }
-               );
-         }
-         
-         function forwardUp(){
-             session.call('com.interactive-object.stop').then(
-                  function (res) {
-                     console.log("stop() ");
-                  },
-                  function (err) {
-                     
-                  }
-               );
-         }
-         
          // fired when connection is established and session attached
          //
          connection.onopen = function (session, details) {
@@ -64,8 +35,25 @@
             session = session;
             var button = document.getElementById("forward");
             if (button.addEventListener) {  // all browsers except IE before version 9
-                button.addEventListener ("mousedown", function () {forwardDown(button)}, false);
-                button.addEventListener ("mouseup", function () {forwardUp(button)}, false);
+                button.addEventListener ("mousedown", function () {
+                  session.call('com.interactive-object.forward').then(
+                  function (res) {
+                     console.log("forward() ");
+                  },
+                  function (err) {
+                     
+                  });
+                }, false);
+                button.addEventListener ("mouseup", function () {
+                  session.call('com.interactive-object.stop').then(
+                  function (res) {
+                     console.log("stop() ");
+                  },
+                  function (err) {
+                     
+                  }
+                  );
+                }, false);
             }
             
            
