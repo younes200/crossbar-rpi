@@ -40,5 +40,6 @@ class AppSession(ApplicationSession):
             self.log.info("stop")
             
         yield self.register(forward, 'com.interactive-object.forward')
-        self.log.info("procedure add2() forward")
+        yield self.register(stop, 'com.interactive-object.stop')
+        self.log.info("procedure forward() and stop() registered")
 
