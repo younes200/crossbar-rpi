@@ -1,0 +1,17 @@
+[Unit]
+Description=Crossbar.io
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+Environment="MYVAR1=foobar"
+ExecStart=/usr/local/bin/crossbar start --cbdir=/home/pi/server/.crossbar
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
