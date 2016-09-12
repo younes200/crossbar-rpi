@@ -41,11 +41,11 @@ class AppSession(ApplicationSession):
         for proc in [self.say, self.is_busy]:
             uri = u'com.interactive-object.iot.speechsynth.{}'.format(proc.__name__)
             yield self.register(proc, uri)
-            self.log.msg("SpeechSynthAdapter registered procedure {}".format(uri))
+            self.log.info("Speech synth registered procedure {}".format(uri))
 
         # signal we are done with initializing our component
         self.publish('com.interactive-object.iot.speechsynth.on_ready')
-        self.log.msg("SpeechSynthAdapter ready.")
+        self.log.info("Speech synth  ready.")
         
         # REGISTER a procedure for remote calling
         #
