@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
    <body>
+      <h1>MR.Robot</h1>
       <button id="forward">Forward</button>
       <button id="backward">Backward</button>
       <button id="left">Left</button>
       <button id="right">Right</button>
       
-      <h1>MR.Robot</h1>
+      <div>
+         Text to speak: <input type="text" id="text_to_speak" name="text_to_speak" value="Hello, my name is Susan. How can I help you?" size="80"><br>
+         <button onclick="speak_now()">Speak Now!</button><br>
+      </div>
+      
       <script>AUTOBAHN_DEBUG = true;</script>
       <script src="/libs/autobahn.min.js"></script>
 
@@ -30,16 +35,25 @@
             realm: "realm1"
          });
 
-
+         var session;
          // fired when connection is established and session attached
          //
-         connection.onopen = function (session, details) {
-
+         connection.onopen = function (new_session, details) {
+            session = new_session;
             console.log("Connected");
             session = session;
+            
+            session.subscribe("com.interactive-object.iot.speechsynth.on_speech_start", function (args) {
+               var text_spoken = args[0];
+               console.log("speech started:", text_spoken);
+            });
+            session.subscribe("com.interactive-object.iot.speechsynth.on_speech_end", function () {
+               console.log("speech stopped");
+            });
+            
             var forwardBtn = document.getElementById("forward");
             forwardBtn.addEventListener("mousedown", function () {
-               session.call('com.interactive-object.forwardon').then(
+               session.call('com.interactive-object.iot.forwardon').then(
                function (res) {
                   console.log("forwardOn() ");
                },
@@ -48,7 +62,7 @@
                });
              }, false);
              forwardBtn.addEventListener ("mouseup", function () {
-               session.call('com.interactive-object.forwardoff').then(
+               session.call('com.interactive-object.iot.forwardoff').then(
                function (res) {
                   console.log("forwardOff() ");
                },
@@ -60,7 +74,7 @@
             
             var backwardBtn = document.getElementById("backward");
             backwardBtn.addEventListener("mousedown", function () {
-               session.call('com.interactive-object.backwardon').then(
+               session.call('com.interactive-object.iot.backwardon').then(
                function (res) {
                   console.log("backwardOn() ");
                },
@@ -69,7 +83,7 @@
                });
              }, false);
              backwardBtn.addEventListener ("mouseup", function () {
-               session.call('com.interactive-object.backwardoff').then(
+               session.call('com.interactive-object.iot.backwardoff').then(
                function (res) {
                   console.log("backwardOff() ");
                },
@@ -81,7 +95,7 @@
              
             var leftBtn = document.getElementById("left");
             leftBtn.addEventListener("mousedown", function () {
-               session.call('com.interactive-object.lefton').then(
+               session.call('com.interactive-object.iot.lefton').then(
                function (res) {
                   console.log("leftOn() ");
                },
@@ -90,7 +104,7 @@
                });
              }, false);
              leftBtn.addEventListener("mouseup", function () {
-               session.call('com.interactive-object.leftoff').then(
+               session.call('com.interactive-object.iot.leftoff').then(
                function (res) {
                   console.log("leftOff() ");
                },
@@ -102,7 +116,7 @@
              
             var rightBtn = document.getElementById("right");
             rightBtn.addEventListener("mousedown", function () {
-               session.call('com.interactive-object.righton').then(
+               session.call('com.interactive-object.iot.righton').then(
                function (res) {
                   console.log("rightOn() ");
                },
@@ -111,7 +125,7 @@
                });
              }, false);
              rightBtn.addEventListener("mouseup", function () {
-               session.call('com.interactive-object.rightoff').then(
+               session.call('com.interactive-object.iot.rightoff').then(
                function (res) {
                   console.log("rightOff() ");
                },
@@ -136,6 +150,22 @@
          //
          connection.open();
 
+         function speak_now() {
+            if (session) {
+               var text_to_speak = document.getElementById('text_to_speak').value;
+               session.call("com.interactive-object.iot.speechsynth.say", [text_to_speak]).then(
+                  function () {
+                     console.log("ok, text spoken.");
+                  },
+                  function (err) {
+                     console.log(err);
+                  }
+               );
+            } else {
+               console.log("not connected");
+            }
+         }
+         
       </script>
    </body>
 </html>
