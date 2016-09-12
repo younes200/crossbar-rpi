@@ -1,0 +1,14 @@
+[Unit]
+Description=Crossbar.io Robot
+After=syslog.target network.target
+
+[Service]
+Type=simple
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+ExecStart=/usr/bin/python -u /home/pi/server/hello.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
