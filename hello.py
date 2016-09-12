@@ -9,6 +9,7 @@
 
 from pololu_drv8835_rpi import motors, MAX_SPEED
 from twisted.internet.defer import inlineCallbacks
+from twisted.internet.utils import getProcessOutput
 from twisted.logger import Logger
 
 from autobahn.twisted.util import sleep
@@ -51,8 +52,8 @@ class AppSession(ApplicationSession):
         #
         def forwardOn():
             self.log.info("forwardOn")
-            motors.motor1.setSpeed(SPEED_2V)
-            motors.motor2.setSpeed(SPEED_2V)
+            motors.motor1.setSpeed(-MAX_SPEED)
+            motors.motor2.setSpeed(-MAX_SPEED)
             
         def forwardOff():
             self.log.info("forwardOff")
@@ -63,8 +64,8 @@ class AppSession(ApplicationSession):
         #
         def backwardOn():
             self.log.info("backwardOn")
-            motors.motor1.setSpeed(-SPEED_2V)
-            motors.motor2.setSpeed(-SPEED_2V)
+            motors.motor1.setSpeed(SPEED_2V)
+            motors.motor2.setSpeed(SPEED_2V)
             
         def backwardOff():
             self.log.info("backwardOff")
@@ -72,13 +73,13 @@ class AppSession(ApplicationSession):
             motors.motor2.setSpeed(0)
             
         def leftOn():    
-            motors.motor2.setSpeed(SPEED_2V)
+            motors.motor2.setSpeed(-SPEED_2V)
             
         def leftOff():
             motors.motor2.setSpeed(0)
 
         def rightOn():    
-            motors.motor1.setSpeed(SPEED_2V)
+            motors.motor1.setSpeed(-SPEED_2V)
             
         def rightOff():
             motors.motor1.setSpeed(0)
