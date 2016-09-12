@@ -24,31 +24,6 @@ class AppSession(ApplicationSession):
     _flite = "/usr/bin/flite"
 
     @inlineCallbacks
-    def say(self, text):
-        """
-        Speak text.
-        """
-        if self._is_busy:
-            raise Exception("already talking")
-        else:
-            # mark TTS engine as busy and publish event
-            self._is_busy = True
-            self.publish('com.interactive-object.iot.speechsynth.on_speech_start', text)
-
-            # start TTS
-            yield getProcessOutput(self._flite, ['-voice', self._voice, '-t', text])
-
-            # mark TTS engine as free and publish event
-            self._is_busy = False
-            self.publish('com.interactive-object.iot.speechsynth.on_speech_end')
-
-    def is_busy(self):
-        """
-        Check if TTS engine is currently busy speaking.
-        """
-        return self._is_busy
-        
-    @inlineCallbacks
     def onJoin(self, details):
 
         # SUBSCRIBE to a topic and receive events
@@ -66,11 +41,11 @@ class AppSession(ApplicationSession):
         for proc in [self.say, self.is_busy]:
             uri = u'com.interactive-object.iot.speechsynth.{}'.format(proc.__name__)
             yield self.register(proc, uri)
-            log.msg("SpeechSynthAdapter registered procedure {}".format(uri))
+            self.log.msg("SpeechSynthAdapter registered procedure {}".format(uri))
 
         # signal we are done with initializing our component
         self.publish('com.interactive-object.iot.speechsynth.on_ready')
-        log.msg("SpeechSynthAdapter ready.")
+        self.log.msg("SpeechSynthAdapter ready.")
         
         # REGISTER a procedure for remote calling
         #
@@ -120,3 +95,28 @@ class AppSession(ApplicationSession):
         
         self.log.info("procedure registered")
 
+    @inlineCallbacks
+    def say(self, text):
+        """
+        Speak text.
+        """
+        if self._is_busy:
+            raise Exception("already talking")
+        else:
+            # mark TTS engine as busy and publish event
+            self._is_busy = True
+            self.publish('com.interactive-object.iot.speechsynth.on_speech_start', text)
+
+            # start TTS
+            yield getProcessOutput(self._flite, ['-voice', self._voice, '-t', text])
+
+            # mark TTS engine as free and publish event
+            self._is_busy = False
+            self.publish('com.interactive-object.iot.speechsynth.on_speech_end')
+
+    def is_busy(self):
+        """
+        Check if TTS engine is currently busy speaking.
+        """
+        return self._is_busy
+        
