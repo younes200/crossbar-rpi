@@ -87,27 +87,18 @@
             });
             
             var forwardBtn = document.getElementById("forward");
-            forwardBtn.addEventListener("mousedown", function () {
-               session.call('com.interactive-object.iot.forwardon').then(
-               function (res) {
-                  console.log("forwardOn() ");
-               },
-               function (err) {
-                  
-               });
-             }, false);
-             forwardBtn.addEventListener ("mouseup", function () {
-               session.call('com.interactive-object.iot.forwardoff').then(
-               function (res) {
-                  console.log("forwardOff() ");
-               },
-               function (err) {
-                  
-               }
-               );
-             }, false);
+            forwardBtn.addEventListener("touchstart", forwardOn, false);
+            forwardBtn.addEventListener("mousedown", forwardOn, false);
+            forwardBtn.addEventListener("touchend", forwardOff, false);
+            forwardBtn.addEventListener("mouseup", forwardOff, false);
+  
             
             var backwardBtn = document.getElementById("backward");
+            backwardBtn.addEventListener("touchstart", backwardOn, false);
+            backwardBtn.addEventListener("mousedown", backwardOn, false);
+            backwardBtn.addEventListener("touchend", backwardOff, false);
+            backwardBtn.addEventListener("mouseup", backwardOff, false);
+            
             backwardBtn.addEventListener("mousedown", function () {
                session.call('com.interactive-object.iot.backwardon').then(
                function (res) {
@@ -201,6 +192,27 @@
             }
          }
          
+         function forwardOn() {
+               session.call('com.interactive-object.iot.forwardon').then(
+               function (res) {
+                  console.log("forwardOn() ");
+               },
+               function (err) {
+                  
+               });
+         }
+         
+         function forwardOff() {
+               session.call('com.interactive-object.iot.forwardoff').then(
+               function (res) {
+                  console.log("forwardOff() ");
+               },
+               function (err) {
+                  
+               });
+             }
+             
+             
          RTCPeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
          RTCSessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
          RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
