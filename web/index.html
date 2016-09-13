@@ -1,12 +1,51 @@
 <!DOCTYPE html>
 <html>
+   <head>
+      <style>
+            #container {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: flex-end;
+            }
+            video {
+                background: #eee none repeat scroll 0 0;
+                border: 1px solid #aaa;
+            }
+            .overlayWrapper {
+                position: relative;
+            }
+            .overlayWrapper .overlay {
+                position: absolute;
+                top: 0;
+                left: 5px;
+            }
+            p {
+                margin: 0.125em;
+            }
+        </style>
+   </head>
    <body>
       <h1>MR.Robot</h1>
-      <button id="forward">Forward</button>
-      <button id="backward">Backward</button>
-      <button id="left">Left</button>
-      <button id="right">Right</button>
+      <a href="#" id="forward">Forward</a>
+      <a href="#" id="backward">Backward</a>
+      <a href="#" id="left">Left</a>
+      <a href="#" id="right">Right</a>
       
+      <div id="container">
+            <div class="overlayWrapper">
+                <video id="remote-video" autoplay="" width="640" height="480">
+                    Your browser does not support the video tag.
+                </video>
+                <p class="overlay">remote</p>
+            </div>
+            <div class="overlayWrapper">
+                <video id="local-video" autoplay="" width="320" height="240">
+                    Your browser does not support the video tag.
+                </video>
+                <p class="overlay">local</p>
+            </div>
+        </div>
+        
       <div>
          Text to speak: <input type="text" id="text_to_speak" name="text_to_speak" value="Hello, my name is Susan. How can I help you?" size="80"><br>
          <button onclick="speak_now()">Speak Now!</button><br>
@@ -18,6 +57,9 @@
       <script>
          // the URL of the WAMP Router (Crossbar.io)
          //
+         var signalling_server_hostname = location.hostname || "192.168.1.8";
+         var signalling_server_address = signalling_server_hostname + ':' + (location.port || 80);
+            
          var wsuri;
          if (document.location.origin == "file://") {
             wsuri = "ws://127.0.0.1:8000/ws";
@@ -41,7 +83,7 @@
          connection.onopen = function (new_session, details) {
             session = new_session;
             console.log("Connected");
-            session = session;
+            startVideo()
             
             session.subscribe("com.interactive-object.iot.speechsynth.on_speech_start", function (args) {
                var text_spoken = args[0];
@@ -165,6 +207,208 @@
                console.log("not connected");
             }
          }
+         
+         RTCPeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+         RTCSessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
+         RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
+         navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+         var URL =  window.URL || window.webkitURL;
+         var ws = null;
+            var pc;
+            var gn;
+            var datachannel, localdatachannel;
+            var audio_video_stream;
+            var pcConfig = {"iceServers": [
+                    {"urls": ["stun:stun.l.google.com:19302", "stun:" + signalling_server_hostname + ":3478"]}
+                ]};
+            var pcOptions = {
+                optional: [
+                    // Deprecated:
+                    //{RtpDataChannels: false},
+                    //{DtlsSrtpKeyAgreement: true}
+                ]
+            };
+            var mediaConstraints = {
+                optional: [],
+                mandatory: {
+                    OfferToReceiveAudio: true,
+                    OfferToReceiveVideo: true
+                }
+            };
+            
+            function createPeerConnection() {
+                try {
+                    pc = new RTCPeerConnection(pcConfig, pcOptions);
+                    pc.onicecandidate = onIceCandidate;
+                    pc.onaddstream = onRemoteStreamAdded;
+                    pc.onremovestream = onRemoteStreamRemoved;
+                    pc.ondatachannel = onDataChannel;
+                    console.log("peer connection successfully created!");
+                } catch (e) {
+                    console.log("createPeerConnection() failed");
+                }
+            }
+            
+            function onDataChannel(event) {
+                console.log("onDataChannel()");
+                datachannel = event.channel;
+
+                event.channel.onopen = function () {
+                    console.log("Data Channel is open!");
+                    document.getElementById('datachannels').disabled = false;
+                };
+
+                event.channel.onerror = function (error) {
+                    console.log("Data Channel Error:", error);
+                };
+
+                event.channel.onmessage = function (event) {
+                    console.log("Got Data Channel Message:", event.data);
+                    document.getElementById('datareceived').value = event.data;
+                };
+
+                event.channel.onclose = function () {
+                    datachannel = null;
+                    document.getElementById('datachannels').disabled = true;
+                    console.log("The Data Channel is Closed");
+                };
+            }
+
+            function onIceCandidate(event) {
+                if (event.candidate) {
+                    var candidate = {
+                        sdpMLineIndex: event.candidate.sdpMLineIndex,
+                        sdpMid: event.candidate.sdpMid,
+                        candidate: event.candidate.candidate
+                    };
+                    var command = {
+                        command_id: "addicecandidate",
+                        data: JSON.stringify(candidate)
+                    };
+                    ws.send(JSON.stringify(command));
+                } else {
+                    console.log("End of candidates.");
+                }
+            }
+
+            function onRemoteStreamAdded(event) {
+                console.log("Remote stream added:", URL.createObjectURL(event.stream));
+                var remoteVideoElement = document.getElementById('remote-video');
+                remoteVideoElement.src = URL.createObjectURL(event.stream);
+                remoteVideoElement.play();
+            }
+
+            function onRemoteStreamRemoved(event) {
+                var remoteVideoElement = document.getElementById('remote-video');
+                remoteVideoElement.src = '';
+            }
+
+            function startVideo() {
+                if ("WebSocket" in window) {
+                    var protocol = location.protocol === "https:" ? "wss:" : "ws:";
+                    ws = new WebSocket(protocol + '//' + signalling_server_hostname + ':8080/stream/webrtc');
+
+                    function offer(stream) {
+                        createPeerConnection();
+                        if (stream) {
+                            pc.addStream(stream);
+                        }
+                        var command = {
+                            command_id: "offer",
+                            options: {
+                                force_hw_vcodec: false,
+                                vformat: 60
+                            }
+                        };
+                        ws.send(JSON.stringify(command));
+                        console.log("offer(), command=" + JSON.stringify(command));
+                    }
+
+                    ws.onopen = function () {
+                        console.log("onopen()");
+                        offer();
+                    };
+
+                    ws.onmessage = function (evt) {
+                        var msg = JSON.parse(evt.data);
+                        //console.log("message=" + msg);
+                        console.log("type=" + msg.type);
+
+                        switch (msg.type) {
+                            case "offer":
+                                pc.setRemoteDescription(new RTCSessionDescription(msg),
+                                    function onRemoteSdpSuccess() {
+                                        console.log('onRemoteSdpSucces()');
+                                        pc.createAnswer(function (sessionDescription) {
+                                            pc.setLocalDescription(sessionDescription);
+                                            var command = {
+                                                command_id: "answer",
+                                                data: JSON.stringify(sessionDescription)
+                                            };
+                                            ws.send(JSON.stringify(command));
+                                            console.log(command);
+
+                                        }, function (error) {
+                                            alert("Failed to createAnswer: " + error);
+
+                                        }, mediaConstraints);
+                                    },
+                                    function onRemoteSdpError(event) {
+                                        alert('Failed to set remote description (unsupported codec on this browser?): ' + event);
+                                        stop();
+                                    }
+                                );
+
+                                var command = {
+                                    command_id: "geticecandidate"
+                                };
+                                console.log(command);
+                                ws.send(JSON.stringify(command));
+                                break;
+
+                            case "answer":
+                                break;
+
+                            case "message":
+                                alert(msg.data);
+                                break;
+
+                            case "geticecandidate":
+                                var candidates = JSON.parse(msg.data);
+                                for (var i = 0; candidates && i < candidates.length; i++) {
+                                    var elt = candidates[i];
+                                    var candidate = new RTCIceCandidate({sdpMLineIndex: elt.sdpMLineIndex, candidate: elt.candidate});
+                                    pc.addIceCandidate(candidate,
+                                        function () {
+                                            console.log("IceCandidate added: " + JSON.stringify(candidate));
+                                        },
+                                        function (error) {
+                                            console.log("addIceCandidate error: " + error);
+                                        }
+                                    );
+                                }
+                                break;
+                        }
+                    };
+
+                    ws.onclose = function (evt) {
+                        if (pc) {
+                            pc.close();
+                            pc = null;
+                        }
+                    };
+
+                    ws.onerror = function (evt) {
+                        alert("An error has occurred!");
+                        ws.close();
+                    };
+
+                } else {
+                    alert("Sorry, this browser does not support WebSockets.");
+                }
+            }
+            
+            
          
       </script>
    </body>
