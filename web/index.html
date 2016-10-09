@@ -51,7 +51,7 @@
          var hostname = location.hostname || "192.168.1.8";
          var server_address = hostname + ':' + (location.port || 8080);
             
-         document.getElementById("video").src= (document.location.protocol === "http:" ? "ws:" : "wss:") + "//" + document.location.host+":8080/stream/video.mjpeg";
+         document.getElementById("video").src= (document.location.protocol === "http:" ? "ws:" : "wss:") + "//" + location.hostname+":8080/stream/video.mjpeg";
          
          var wsuri;
          if (document.location.origin == "file://") {
