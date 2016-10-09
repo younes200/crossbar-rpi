@@ -210,7 +210,48 @@
                function (err) {
                   
                });
-             }
+          }
+         
+         document.onkeydown = checkKeyDown;
+         document.onkeyup = checkKeyUp;
+
+   function checkKeyDown(e) {
+
+       e = e || window.event;
+
+       if (e.keyCode == '38') {
+          forwardOn()
+       }
+       else if (e.keyCode == '40') {
+           // down arrow
+       }
+       else if (e.keyCode == '37') {
+          // left arrow
+       }
+       else if (e.keyCode == '39') {
+          // right arrow
+       }
+
+   }
+         
+   function checkKeyUp(e) {
+
+       e = e || window.event;
+
+       if (e.keyCode == '38') {
+          forwardOff()
+       }
+       else if (e.keyCode == '40') {
+           // down arrow
+       }
+       else if (e.keyCode == '37') {
+          // left arrow
+       }
+       else if (e.keyCode == '39') {
+          // right arrow
+       }
+
+   }
 
       </script>
    </body>
