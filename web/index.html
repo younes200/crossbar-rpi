@@ -202,6 +202,7 @@
                });
          }
          
+ 
          function forwardOff() {
                session.call('com.interactive-object.iot.forwardoff').then(
                function (res) {
@@ -211,6 +212,68 @@
                   
                });
           }
+         
+         
+         function backwardOn() {
+               session.call('com.interactive-object.iot.backwardon').then(
+               function (res) {
+                  console.log("backwardOn() ");
+               },
+               function (err) {
+                  
+               });
+         }
+ 
+         function backwardOff() {
+               session.call('com.interactive-object.iot.backwardoff').then(
+               function (res) {
+                  console.log("backwardOff() ");
+               },
+               function (err) {
+                  
+               });
+          }
+         
+         function rightOn() {
+               session.call('com.interactive-object.iot.righton').then(
+               function (res) {
+                  console.log("backwardOn() ");
+               },
+               function (err) {
+                  
+               });
+         }
+ 
+         function rightOff() {
+               session.call('com.interactive-object.iot.rightoff').then(
+               function (res) {
+                  console.log("backwardOff() ");
+               },
+               function (err) {
+                  
+               });
+          }
+         
+         function leftOn() {
+               session.call('com.interactive-object.iot.lefton').then(
+               function (res) {
+                  console.log("leftOn() ");
+               },
+               function (err) {
+                  
+               });
+         }
+ 
+         function leftOff() {
+               session.call('com.interactive-object.iot.leftoff').then(
+               function (res) {
+                  console.log("leftOff() ");
+               },
+               function (err) {
+                  
+               });
+          }
+         
          
          document.onkeydown = checkKeyDown;
          document.onkeyup = checkKeyUp;
@@ -223,13 +286,13 @@
           forwardOn()
        }
        else if (e.keyCode == '40') {
-           // down arrow
+           backwardOn()
        }
        else if (e.keyCode == '37') {
-          // left arrow
+          leftOn()
        }
        else if (e.keyCode == '39') {
-          // right arrow
+         rightOn();
        }
 
    }
@@ -242,13 +305,13 @@
           forwardOff()
        }
        else if (e.keyCode == '40') {
-           // down arrow
+           backwardOff()
        }
        else if (e.keyCode == '37') {
-          // left arrow
+          leftOff()
        }
        else if (e.keyCode == '39') {
-          // right arrow
+         rightOff();
        }
 
    }
